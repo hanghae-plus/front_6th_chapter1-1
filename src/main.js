@@ -6,7 +6,7 @@ const enableMocking = () =>
   );
 
 function main() {
-  const 상품목록_레이아웃_로딩 = `
+  const 상품목록_레이아웃_로딩 = ` 
     <div class="min-h-screen bg-gray-50">
       <header class="bg-white shadow-sm sticky top-0 z-40">
         <div class="max-w-md mx-auto px-4 py-4">

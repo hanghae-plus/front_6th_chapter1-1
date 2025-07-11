@@ -1,5 +1,6 @@
 import { screen } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
+import { beforeEach } from "vitest";
 import { afterEach, beforeAll, describe, expect, test } from "vitest";
 
 const goTo = (path) => {
@@ -12,9 +13,12 @@ beforeAll(async () => {
   await import("../main.js");
 });
 
+beforeEach(() => {
+  goTo("/");
+});
+
 afterEach(() => {
   // 각 테스트 후 상태 초기화
-  goTo("/");
   document.getElementById("root").innerHTML = "";
   localStorage.clear();
 });
@@ -31,6 +35,7 @@ const 상품_상세페이지_접속 = async () => {
 
   // 상품 이미지 클릭
   await userEvent.click(productImage);
+
   await screen.findByRole("heading", {
     level: 1,
     name: "PVC 투명 젤리 쇼핑백 1호 와인 답례품 구디백 비닐 손잡이 미니 간식 선물포장",

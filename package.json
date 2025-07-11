@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "build:prod": "NODE_ENV=production vite build",
+    "preview:prod": "NODE_ENV=production vite preview",
+    "deploy": "pnpm build:prod && pnpm preview:prod",
     "dev": "vite",
     "dev:hash": "vite --open ./index.hash.html",
     "build": "vite build",
@@ -52,5 +55,8 @@
     "workerDirectory": [
       "public"
     ]
+  },
+  "dependencies": {
+    "playwright": "^1.53.2"
   }
 }

@@ -4,7 +4,7 @@ import { afterAll, beforeAll } from "vitest";
 import { server } from "./__tests__/mockServerHandler.js";
 
 configure({
-  asyncUtilTimeout: 5000,
+  asyncUtilTimeout: 1000,
 });
 
 beforeAll(() => {

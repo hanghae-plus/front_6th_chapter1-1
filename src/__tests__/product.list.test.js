@@ -111,7 +111,10 @@ describe("3. 페이지당 상품 수 선택", () => {
       ).not.toBeInTheDocument(),
     );
 
-    expect(document.querySelectorAll(".product-card").length).toBe(10);
+     await waitFor(() => {
+      const productCards = document.querySelectorAll(".product-card");
+      expect(productCards).toHaveLength(10);
+    });
   });
 });
 

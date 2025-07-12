@@ -1,26 +1,79 @@
 <!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>상품 쇼핑몰</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/src/styles.css">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: "#3b82f6",
-            secondary: "#6b7280"
-          }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>상품 쇼핑몰</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3b82f6",
+              secondary: "#6b7280",
+            },
+          },
+        },
+      };
+    </script>
+    <script type="text/javascript">
+      (function (l) {
+        if (l.search[1] === "/") {
+          var decoded = l.search
+            .slice(1)
+            .split("&")
+            .map(function (s) {
+              return s.replace(/~and~/g, "&");
+            })
+            .join("?");
+          window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash);
         }
-      }
-    };
-  </script>
-</head>
-<body class="bg-gray-50">
-<div id="root"></div>
-<script type="module" src="/src/main.js"></script>
-</body>
+      })(window.location);
+    </script>
+    <script type="module" src="/src/main.js"></script>
+    <link rel="stylesheet" href="/src/styles.css">
+
+  </head>
+  <body class="bg-gray-50">
+    <div id="root">
+      <!-- JavaScript 로드 전까지 표시될 기본 콘텐츠 -->
+      <div class="min-h-screen bg-gray-50">
+        <!-- Header -->
+        <header class="bg-white shadow-sm sticky top-0 z-40">
+          <div class="max-w-md mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+              <h1 class="text-xl font-bold text-gray-900">
+                <a href="/front_6th_chapter1-1/">상품 쇼핑몰</a>
+              </h1>
+            </div>
+          </div>
+        </header>
+
+        <!-- Main Content -->
+        <!-- <main class="max-w-md mx-auto px-4 py-4">
+          <div class="text-center my-4 py-20 shadow-md p-6 bg-white rounded-lg">
+            <div class="inline-flex items-center">
+              <svg class="animate-spin h-8 w-8 text-blue-600 mr-3" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              <span class="text-gray-600">로딩 중...</span>
+            </div>
+          </div>
+        </main> -->
+
+        <!-- Footer -->
+        <footer class="bg-white shadow-sm sticky top-0 z-40">
+          <div class="max-w-md mx-auto py-8 text-center text-gray-500">
+            <p>© 2025 항해플러스 프론트엔드 쇼핑몰</p>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </body>
 </html>

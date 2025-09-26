@@ -1,50 +1,10 @@
 import { expect, test } from "@playwright/test";
+import { E2EHelpers } from "./E2EHelpers.js";
 
 // 테스트 설정
 test.describe.configure({ mode: "serial" });
 
-// 헬퍼 함수들
-class E2EHelpers {
-  constructor(page) {
-    this.page = page;
-  }
-
-  // 페이지 로딩 대기
-  async waitForPageLoad() {
-    await this.page.waitForSelector('[data-testid="products-grid"], #products-grid', { timeout: 10000 });
-    await this.page.waitForFunction(() => {
-      const text = document.body.textContent;
-      return text.includes("총") && text.includes("개");
-    });
-  }
-
-  // 상품을 장바구니에 추가
-  async addProductToCart(productName) {
-    await this.page.click(
-      `text=${productName} >> xpath=ancestor::*[contains(@class, 'product-card')] >> .add-to-cart-btn`,
-    );
-    await this.page.waitForSelector("text=장바구니에 추가되었습니다", { timeout: 5000 });
-  }
-
-  // 토스트 메시지가 사라질 때까지 대기
-  async waitForToastToDisappear() {
-    await this.page.waitForSelector("text=장바구니에 추가되었습니다", { state: "hidden", timeout: 5000 });
-  }
-
-  // 장바구니 모달 열기
-  async openCartModal() {
-    await this.page.click("#cart-icon-btn");
-    await this.page.waitForSelector(".cart-modal-overlay", { timeout: 5000 });
-  }
-
-  // 현재 상품 개수 가져오기
-  async getCurrentProductCount() {
-    const countText = await this.page.textContent('[data-testid="product-count"]');
-    return countText ? parseInt(countText.replace(/[^\d]/g, "")) : 0;
-  }
-}
-
-test.describe("E2E: 쇼핑몰 전체 사용자 시나리오", () => {
+test.describe("E2E: 쇼핑몰 전체 사용자 시나리오 (심화과제)", () => {
   test.beforeEach(async ({ page }) => {
     // 로컬 스토리지 초기화
     await page.goto("/");
@@ -58,12 +18,8 @@ test.describe("E2E: 쇼핑몰 전체 사용자 시나리오", () => {
     test("페이지 접속 시 로딩 상태가 표시되고 상품 목록이 정상적으로 로드된다", async ({ page }) => {
       const helpers = new E2EHelpers(page);
 
-      await page.goto("/");
-
       // 로딩 상태 확인
       await expect(page.locator("text=카테고리 로딩 중...")).toBeVisible();
-
-      // 상품 목록 로드 완료 대기
       await helpers.waitForPageLoad();
 
       // 상품 개수 확인 (340개)
@@ -78,8 +34,6 @@ test.describe("E2E: 쇼핑몰 전체 사용자 시나리오", () => {
 
     test("상품 카드에 기본 정보가 올바르게 표시된다", async ({ page }) => {
       const helpers = new E2EHelpers(page);
-
-      await page.goto("/");
       await helpers.waitForPageLoad();
 
       // 첫 번째 상품 카드 확인
@@ -102,8 +56,6 @@ test.describe("E2E: 쇼핑몰 전체 사용자 시나리오", () => {
   test.describe("2. 검색 및 필터링 기능", () => {
     test("검색어 입력 후 Enter 키로 검색하고 URL이 업데이트된다", async ({ page }) => {
       const helpers = new E2EHelpers(page);
-
-      await page.goto("/");
       await helpers.waitForPageLoad();
 
       // 검색어 입력
@@ -137,8 +89,6 @@ test.describe("E2E: 쇼핑몰 전체 사용자 시나리오", () => {
 
     test("카테고리 선택 후 브레드크럼과 URL이 업데이트된다", async ({ page }) => {
       const helpers = new E2EHelpers(page);
-
-      await page.goto("/");
       await helpers.waitForPageLoad();
 
       // 1차 카테고리 선택
@@ -197,8 +147,6 @@ test.describe("E2E: 쇼핑몰 전체 사용자 시나리오", () => {
 
     test("정렬 옵션 변경 시 URL이 업데이트된다", async ({ page }) => {
       const helpers = new E2EHelpers(page);
-
-      await page.goto("/");
       await helpers.waitForPageLoad();
 
       // 가격 높은순으로 정렬
@@ -244,8 +192,6 @@ test.describe("E2E: 쇼핑몰 전체 사용자 시나리오", () => {
 
     test("페이지당 상품 수 변경 시 URL이 업데이트된다", async ({ page }) => {
       const helpers = new E2EHelpers(page);
-
-      await page.goto("/");
       await helpers.waitForPageLoad();
 
       // 10개로 변경
@@ -293,7 +239,7 @@ test.describe("E2E: 쇼핑몰 전체 사용자 시나리오", () => {
     });
   });
 
-  test.describe("3. 상태 유지 및 URL 복원", () => {
+  test.describe("3. URL로 접근시 UI복원", () => {
     test("검색어와 필터 조건이 URL에서 복원된다", async ({ page }) => {
       const helpers = new E2EHelpers(page);
 
@@ -309,63 +255,15 @@ test.describe("E2E: 쇼핑몰 전체 사용자 시나리오", () => {
       // 카테고리 브레드크럼 확인
       await expect(page.locator("text=카테고리:").locator("..")).toContainText("생활/건강");
     });
-
-    test("장바구니 내용이 localStorage에 저장되고 복원된다", async ({ page }) => {
-      const helpers = new E2EHelpers(page);
-
-      await page.goto("/");
-      await helpers.waitForPageLoad();
-
-      // 상품을 장바구니에 추가
-      await helpers.addProductToCart("PVC 투명 젤리 쇼핑백");
-
-      // 장바구니 아이콘에 개수 표시 확인
-      await expect(page.locator("#cart-icon-btn span")).toBeVisible();
-
-      // localStorage에 저장되었는지 확인
-      const cartData = await page.evaluate(() => localStorage.getItem("shopping_cart"));
-      expect(cartData).toBeTruthy();
-
-      // 페이지 새로고침
-      await page.reload();
-      await helpers.waitForPageLoad();
-
-      // 장바구니 아이콘에 여전히 개수가 표시되는지 확인
-      await expect(page.locator("#cart-icon-btn span")).toBeVisible();
-    });
-
-    test("장바구니 아이콘에 상품 개수가 정확히 표시된다", async ({ page }) => {
-      const helpers = new E2EHelpers(page);
-
-      await page.goto("/");
-      await helpers.waitForPageLoad();
-
-      // 초기에는 개수 표시가 없어야 함
-      await expect(page.locator("#cart-icon-btn span")).not.toBeVisible();
-
-      // 첫 번째 상품 추가
-      await helpers.addProductToCart("PVC 투명 젤리 쇼핑백");
-      await expect(page.locator("#cart-icon-btn span")).toHaveText("1");
-
-      // 두 번째 상품 추가
-      await helpers.addProductToCart("샷시 풍지판");
-      await expect(page.locator("#cart-icon-btn span")).toHaveText("2");
-
-      // 첫 번째 상품 한 번 더 추가
-      await helpers.addProductToCart("PVC 투명 젤리 쇼핑백");
-      await expect(page.locator("#cart-icon-btn span")).toHaveText("2");
-    });
   });
 
-  test.describe("4. 상품 상세 페이지 워크플로우", () => {
+  test.describe("4. 상품 상세 페이지", () => {
     test("상품 클릭부터 관련 상품 이동까지 전체 플로우", async ({ page }) => {
       const helpers = new E2EHelpers(page);
-
-      await page.goto("/");
+      await helpers.waitForPageLoad();
       await page.evaluate(() => {
         window.loadFlag = true;
       });
-      await helpers.waitForPageLoad();
 
       // 상품 이미지 클릭하여 상세 페이지로 이동
       const productCard = page
@@ -420,181 +318,9 @@ test.describe("E2E: 쇼핑몰 전체 사용자 시나리오", () => {
     });
   });
 
-  test.describe("5. 장바구니 완전한 워크플로우", () => {
-    test("여러 상품 추가, 수량 조절, 선택 삭제 전체 시나리오", async ({ page }) => {
-      const helpers = new E2EHelpers(page);
-
-      await page.goto("/");
-      await helpers.waitForPageLoad();
-
-      // 첫 번째 상품 추가
-      await helpers.addProductToCart("PVC 투명 젤리 쇼핑백");
-
-      // 두 번째 상품 추가
-      await helpers.addProductToCart("샷시 풍지판");
-
-      // 장바구니 아이콘에 개수 표시 확인 (2개)
-      await expect(page.locator("#cart-icon-btn span")).toHaveText("2");
-
-      // 장바구니 모달 열기
-      await helpers.openCartModal();
-
-      // 두 상품이 모두 있는지 확인
-      await expect(page.locator(".cart-modal")).toContainText("PVC 투명 젤리 쇼핑백");
-      await expect(page.locator(".cart-modal")).toContainText("샷시 풍지판");
-
-      // 첫 번째 상품 수량 증가
-      await page.locator(".quantity-increase-btn").first().click();
-
-      // 총 금액 업데이트 확인
-      await expect(page.locator("#root")).toMatchAriaSnapshot(`
-    - text: /총 금액 670원/
-    - button "전체 비우기"
-    - button "구매하기"
-    `);
-
-      // 첫 번째 상품만 선택
-      await page.locator(".cart-item-checkbox").first().check();
-
-      // 선택 삭제
-      await page.click("#cart-modal-remove-selected-btn");
-
-      // 첫 번째 상품만 삭제되고 두 번째 상품은 남아있는지 확인
-      await expect(page.locator(".cart-modal")).not.toContainText("PVC 투명 젤리 쇼핑백");
-      await expect(page.locator(".cart-modal")).toContainText("샷시 풍지판");
-
-      // 장바구니 아이콘 개수 업데이트 확인 (1개)
-      await expect(page.locator("#cart-icon-btn span")).toHaveText("1");
-    });
-
-    test("전체 선택 후 장바구니 비우기", async ({ page }) => {
-      const helpers = new E2EHelpers(page);
-
-      await page.goto("/");
-      await helpers.waitForPageLoad();
-
-      // 여러 상품 추가
-      await helpers.addProductToCart("PVC 투명 젤리 쇼핑백");
-      await helpers.addProductToCart("고양이 난간 안전망");
-
-      // 장바구니 모달 열기
-      await helpers.openCartModal();
-
-      // 전체 선택
-      await page.check("#cart-modal-select-all-checkbox");
-
-      // 모든 상품이 선택되었는지 확인
-      const checkboxes = page.locator(".cart-item-checkbox");
-      const count = await checkboxes.count();
-      for (let i = 0; i < count; i++) {
-        await expect(checkboxes.nth(i)).toBeChecked();
-      }
-
-      // 장바구니 비우기
-      await page.click("#cart-modal-clear-cart-btn");
-
-      // 장바구니가 비어있는지 확인
-      await expect(page.locator("text=장바구니가 비어있습니다")).toBeVisible();
-
-      // 장바구니 아이콘에서 개수 표시가 사라졌는지 확인
-      await expect(page.locator("#cart-icon-btn span")).not.toBeVisible();
-    });
-  });
-
-  test.describe("6. 무한 스크롤 기능", () => {
-    test("페이지 하단 스크롤 시 추가 상품이 로드된다", async ({ page }) => {
-      const helpers = new E2EHelpers(page);
-
-      await page.goto("/");
-      await helpers.waitForPageLoad();
-
-      // 초기 상품 카드 수 확인
-      const initialCards = await page.locator(".product-card").count();
-      expect(initialCards).toBe(20);
-
-      // 페이지 하단으로 스크롤
-      await page.evaluate(() => {
-        window.scrollTo(0, document.body.scrollHeight);
-      });
-
-      // 로딩 인디케이터 확인
-      await expect(page.locator("text=상품을 불러오는 중...")).toBeVisible();
-
-      // 추가 상품 로드 대기
-      await page.waitForFunction(
-        () => {
-          return document.querySelectorAll(".product-card").length > 20;
-        },
-        { timeout: 5000 },
-      );
-
-      // 상품 수가 증가했는지 확인
-      const updatedCards = await page.locator(".product-card").count();
-      expect(updatedCards).toBeGreaterThan(initialCards);
-    });
-  });
-
-  test.describe("7. 모달 및 UI 인터랙션", () => {
-    test("장바구니 모달이 다양한 방법으로 열리고 닫힌다", async ({ page }) => {
-      const helpers = new E2EHelpers(page);
-
-      await page.goto("/");
-      await helpers.waitForPageLoad();
-
-      // 모달 열기
-      await page.click("#cart-icon-btn");
-      await expect(page.locator(".cart-modal-overlay")).toBeVisible();
-
-      // ESC 키로 닫기
-      await page.keyboard.press("Escape");
-      await expect(page.locator(".cart-modal-overlay")).not.toBeVisible();
-
-      // 다시 열기
-      await page.click("#cart-icon-btn");
-      await expect(page.locator(".cart-modal-overlay")).toBeVisible();
-
-      // X 버튼으로 닫기
-      await page.click("#cart-modal-close-btn");
-      await expect(page.locator(".cart-modal-overlay")).not.toBeVisible();
-
-      // 다시 열기
-      await page.click("#cart-icon-btn");
-      await expect(page.locator(".cart-modal-overlay")).toBeVisible();
-
-      // 배경 클릭으로 닫기 (모달 내용이 아닌 오버레이 영역 클릭)
-      await page.locator(".cart-modal-overlay").click({ position: { x: 10, y: 10 } });
-      await expect(page.locator(".cart-modal-overlay")).not.toBeVisible();
-    });
-
-    test("토스트 메시지 시스템이 올바르게 작동한다", async ({ page }) => {
-      const helpers = new E2EHelpers(page);
-
-      await page.goto("/");
-      await helpers.waitForPageLoad();
-
-      // 상품을 장바구니에 추가하여 토스트 메시지 트리거
-      await helpers.addProductToCart("PVC 투명 젤리 쇼핑백");
-
-      // 토스트 메시지 표시 확인
-      await expect(page.locator("text=장바구니에 추가되었습니다")).toBeVisible();
-
-      // 닫기 버튼이 있다면 클릭해서 수동으로 닫기 테스트
-      const closeButton = page.locator(".toast-close-btn");
-      if (await closeButton.isVisible()) {
-        await closeButton.click();
-        await expect(page.locator("text=장바구니에 추가되었습니다")).not.toBeVisible();
-      } else {
-        // 자동으로 사라지는지 확인
-        await expect(page.locator("text=장바구니에 추가되었습니다")).not.toBeVisible({ timeout: 4000 });
-      }
-    });
-  });
-
-  test.describe("8. SPA 네비게이션", () => {
+  test.describe("5. SPA 네비게이션", () => {
     test("브라우저 뒤로가기/앞으로가기가 올바르게 작동한다", async ({ page }) => {
       const helpers = new E2EHelpers(page);
-
-      await page.goto("/");
       await page.evaluate(() => {
         window.loadFlag = true;
       });

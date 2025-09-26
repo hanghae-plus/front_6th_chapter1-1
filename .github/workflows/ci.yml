@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  unit:
+  basic:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -24,11 +24,10 @@ jobs:
         with:
           node-version: 22
           cache: 'pnpm'
-      - name: Install dependencies
-        run: |
+      - run: |
           pnpm install
-          pnpm run test
-  e2e:
+          pnpm run test:e2e:basic
+  advanced:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -47,4 +46,4 @@ jobs:
         run: |
           pnpm install
           npx playwright install --with-deps
-          pnpm run test:e2e
+          pnpm run test:e2e:advanced

@@ -16,7 +16,8 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "npx playwright show-report",
     "test:generate": "playwright codegen localhost:5173",
-    "prepare": "husky"
+    "prepare": "husky",
+    "gh-pages": "pnpm run build && gh-pages -d dist"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -42,7 +43,8 @@
     "msw": "^2.10.2",
     "prettier": "^3.4.2",
     "vite": "npm:rolldown-vite@latest",
-    "vitest": "latest"
+    "vitest": "latest",
+    "gh-pages": "latest"
   },
   "msw": {
     "workerDirectory": [

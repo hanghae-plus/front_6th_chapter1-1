@@ -111,7 +111,7 @@ export const handlers = [
   }),
 
   // 상품 상세 API
-  http.get("/api/products/:id", async ({ params }) => {
+  http.get("/api/products/:id", ({ params }) => {
     const { id } = params;
     const product = items.find((item) => item.productId === id);
 
@@ -129,7 +129,6 @@ export const handlers = [
       images: [product.image, product.image.replace(".jpg", "_2.jpg"), product.image.replace(".jpg", "_3.jpg")],
     };
 
-    await delay();
     return HttpResponse.json(detailProduct);
   }),
 
